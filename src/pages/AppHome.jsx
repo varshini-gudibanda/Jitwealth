@@ -10,7 +10,9 @@ import GlassOverlay from "../components/GlassOverlay";
 export default function AppHome() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("home");
-  const userEmail = localStorage.getItem("userEmail") || "user@jitwealth.com";
+
+  const userEmail =
+    localStorage.getItem("userEmail") || "user@jitwealth.com";
   const userName = userEmail.split("@")[0];
 
   useEffect(() => {
@@ -37,13 +39,20 @@ export default function AppHome() {
 
   return (
     <>
+      {/* BACKGROUND LAYERS */}
+      <BackgroundVideo />
+      <GlassOverlay />
+
       <AppNavbar activeSection={activeSection} />
       <ScrollDots active={activeSection} />
 
       <div
         style={{
           marginTop: "120px",
-          paddingBottom: "200px"
+          paddingBottom: "200px",
+          position: "relative",
+          zIndex: 2,
+          color: "#fff"
         }}
       >
         {/* HOME */}
@@ -52,7 +61,13 @@ export default function AppHome() {
           title={`Welcome, ${userName}`}
           desc={
             <>
-              <div style={{ fontSize: "16px", marginBottom: "12px", color: "#777" }}>
+              <div
+                style={{
+                  fontSize: "16px",
+                  marginBottom: "15px",
+                  color: "#dddddd"
+                }}
+              >
                 {userEmail}
               </div>
 
@@ -61,8 +76,8 @@ export default function AppHome() {
                 style={{
                   display: "grid",
                   gridTemplateColumns: "repeat(3, 1fr)",
-                  gap: "20px",
-                  margin: "30px 0"
+                  gap: "25px",
+                  margin: "40px 0"
                 }}
               >
                 <StatCard
@@ -82,16 +97,25 @@ export default function AppHome() {
                 />
               </div>
 
-              <div style={{ color: "#555", maxWidth: "700px", margin: "0 auto" }}>
-                Jit Wealth helps traders and investors understand the Indian stock market with clarity.
-                Learn proven strategies, insights, and tools to grow your wealth consistently.
+              <div
+                style={{
+                  color: "#cccccc",
+                  maxWidth: "700px",
+                  margin: "0 auto"
+                }}
+              >
+                Jit Wealth helps traders and investors understand the
+                Indian stock market with clarity. Learn proven strategies,
+                insights, and tools to grow your wealth consistently.
               </div>
             </>
           }
           arrow
           active={activeSection === "home"}
           onClick={() =>
-            document.getElementById("courses")?.scrollIntoView({ behavior: "smooth" })
+            document
+              .getElementById("courses")
+              ?.scrollIntoView({ behavior: "smooth" })
           }
         />
 
@@ -115,14 +139,11 @@ export default function AppHome() {
           onClick={() => navigate("/calculator")}
         />
 
+        {/* CONTACT */}
         <div id="contact">
-  <ContactFooter />
-  <FloatingWhatsApp />
-  <BackgroundVideo />
-  <GlassOverlay />
-    {/* Everything else below */}
-  <AppNavbar activeSection={activeSection} />
-</div>
+          <ContactFooter />
+          <FloatingWhatsApp />
+        </div>
       </div>
     </>
   );
@@ -130,7 +151,16 @@ export default function AppHome() {
 
 /* ---------------- SECTION COMPONENT ---------------- */
 
-function Section({ id, title, desc, action, onClick, disabled, arrow, active }) {
+function Section({
+  id,
+  title,
+  desc,
+  action,
+  onClick,
+  disabled,
+  arrow,
+  active
+}) {
   return (
     <div
       id={id}
@@ -144,34 +174,53 @@ function Section({ id, title, desc, action, onClick, disabled, arrow, active }) 
       <div
         onClick={!disabled ? onClick : undefined}
         style={{
-          padding: "60px",
-          borderRadius: "24px",
-          width: "80%",
-          maxWidth: "900px",
+          padding: "70px",
+          borderRadius: "28px",
+          width: "85%",
+          maxWidth: "950px",
           textAlign: "center",
           cursor: disabled ? "not-allowed" : "pointer",
-          border: active ? "2px solid #C9A24D" : "1px solid #eee",
+          background: "rgba(0,0,0,0.65)",
+          backdropFilter: "blur(20px)",
+          border: active
+            ? "2px solid #C9A24D"
+            : "1px solid rgba(255,255,255,0.15)",
           boxShadow: active
-            ? "0 30px 60px rgba(201,162,77,0.35)"
-            : "0 20px 50px rgba(0,0,0,0.12)",
+            ? "0 35px 70px rgba(201,162,77,0.4)"
+            : "0 25px 60px rgba(0,0,0,0.4)",
           transition: "0.4s"
         }}
       >
-        <h1 style={{ fontSize: "48px", color: "#C9A24D" }}>{title}</h1>
+        <h1
+          style={{
+            fontSize: "48px",
+            color: "#E6B85C",
+            textShadow: "0 0 20px rgba(0,0,0,0.8)"
+          }}
+        >
+          {title}
+        </h1>
 
-        <div style={{ marginTop: "20px", fontSize: "18px", color: "#555" }}>
+        <div
+          style={{
+            marginTop: "25px",
+            fontSize: "18px",
+            color: "#dddddd"
+          }}
+        >
           {desc}
         </div>
 
-        <div style={{ marginTop: "40px" }}>
+        <div style={{ marginTop: "45px" }}>
           {arrow ? (
-            <div style={{ fontSize: "42px", color: "#C9A24D" }}>↓</div>
+            <div style={{ fontSize: "42px", color: "#E6B85C" }}>↓</div>
           ) : (
             <div
               style={{
                 display: "inline-block",
                 padding: "14px 34px",
                 borderRadius: "30px",
+                background: "#C9A24D",
                 color: "#000",
                 fontWeight: "700"
               }}
@@ -189,18 +238,31 @@ function StatCard({ title, value, text }) {
   return (
     <div
       style={{
-        borderRadius: "18px",
-        padding: "24px",
-        border: "1px solid #f0e0b5",
-        boxShadow: "0 10px 25px rgba(0,0,0,0.08)",
+        borderRadius: "20px",
+        padding: "28px",
+        background: "rgba(0,0,0,0.55)",
+        backdropFilter: "blur(15px)",
+        border: "1px solid rgba(201,162,77,0.5)",
+        boxShadow: "0 15px 40px rgba(0,0,0,0.5)",
         textAlign: "center"
       }}
     >
-      <h4 style={{ fontSize: "14px", color: "#888" }}>{title}</h4>
-      <div style={{ fontSize: "28px", fontWeight: "800", color: "#C9A24D", margin: "10px 0" }}>
+      <h4 style={{ fontSize: "14px", color: "#cccccc" }}>
+        {title}
+      </h4>
+      <div
+        style={{
+          fontSize: "30px",
+          fontWeight: "900",
+          color: "#E6B85C",
+          margin: "12px 0"
+        }}
+      >
         {value}
       </div>
-      <p style={{ fontSize: "13px", color: "#666" }}>{text}</p>
+      <p style={{ fontSize: "14px", color: "#dddddd" }}>
+        {text}
+      </p>
     </div>
   );
 }

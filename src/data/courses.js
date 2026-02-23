@@ -1,21 +1,27 @@
 const courses = [
   {
-    id: "stock-basics",
-    title: "Beginner Stock Market",
-    desc: "Perfect for newcomers.",
-    image: "https://images.pexels.com/photos/7550394/pexels-photo-7550394.jpeg"
+    id: 1,
+    title: "Intraday Trading Mastery",
+    desc: "Learn high probability intraday strategies",
+    status: "In Progress",
+    progress: 65,
+    image: "/course-images/intraday.jpg"
   },
   {
-    id: "day-trading",
-    title: "Day Trading Mastery",
-    desc: "Learn intraday strategies and risk control.",
-    image: "https://images.pexels.com/photos/6802047/pexels-photo-6802047.jpeg"
+    id: 2,
+    title: "Options Scalping Pro",
+    desc: "Advanced options scalping framework",
+    status: "Completed",
+    progress: 100,
+    image: "/course-images/options.jpg"
   },
   {
-    id: "options",
-    title: "Options Trading",
-    desc: "Strategies to hedge risk and profit smartly.",
-    image: "https://images.pexels.com/photos/6802048/pexels-photo-6802048.jpeg"
+    id: 3,
+    title: "Swing Trading Blueprint",
+    desc: "Hold trades with confidence",
+    status: "Paid",
+    progress: 0,
+    image: "/course-images/swing.jpg"
   }
 ];
 

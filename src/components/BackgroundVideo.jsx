@@ -1,11 +1,16 @@
 export default function BackgroundVideo() {
   return (
-    <div style={{
-      position: "fixed",
-      inset: 0,
-      zIndex: -1,
-      overflow: "hidden"
-    }}>
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        zIndex: -2,
+        overflow: "hidden"
+      }}
+    >
       <video
         autoPlay
         loop
@@ -15,18 +20,21 @@ export default function BackgroundVideo() {
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          filter: "brightness(1.4) contrast(1.05)"
+          filter: "brightness(0.7) contrast(1.1)" // 🔥 soft darkness
         }}
       >
         <source src="/bg.mp4" type="video/mp4" />
       </video>
 
-      <div style={{
-        position: "absolute",
-        inset: 0,
-        background:
-          "linear-gradient(180deg, rgba(255,255,255,0.15), rgba(201,162,77,0.18))"
-      }} />
+      {/* LIGHT OVERLAY */}
+      <div
+        style={{
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          background: "rgba(0,0,0,0.35)" // ✨ light overlay
+        }}
+      />
     </div>
   );
 }

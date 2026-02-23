@@ -1,155 +1,122 @@
-import { useState } from "react";
-import Navbar from "../components/Navbar";
+import { useParams } from "react-router-dom";
+import AppNavbar from "../components/AppNavbar";
 
-export default function CourseDetails() {
-  const [open, setOpen] = useState(null);
+export default function CourseDetail() {
+  const { id } = useParams();
 
-  const toggle = (i) => {
-    setOpen(open === i ? null : i);
+  const course = {
+    title: "Intraday Trading Mastery",
+    description:
+      "Master high-probability intraday setups with proper risk management.",
+    progress: 65,
+    lessons: [
+      { id: 1, title: "Market Structure Basics", completed: true },
+      { id: 2, title: "Entry & Stop Loss Logic", completed: true },
+      { id: 3, title: "Target Mapping", completed: false },
+      { id: 4, title: "Live Market Examples", locked: true },
+    ],
   };
 
   return (
     <>
-      <Navbar />
+      <AppNavbar />
 
-      <section style={page}>
-        <div style={container}>
-          {/* LEFT */}
-          <div>
-            <h1 style={title}>
-              Stock Market <span style={{ color: "#C9A24D" }}>Basics</span>
-            </h1>
+      <div
+        style={{
+          minHeight: "100vh",
+          paddingTop: "120px",
+          background: "#fafafa",
+        }}
+      >
+        {/* HEADER */}
+        <div
+          style={{
+            maxWidth: "1100px",
+            margin: "auto",
+            padding: "40px",
+            background: "#fff",
+            borderRadius: "24px",
+            boxShadow: "0 20px 50px rgba(0,0,0,0.08)",
+          }}
+        >
+          <h1 style={{ fontSize: "36px", fontWeight: "900" }}>
+            {course.title}
+          </h1>
 
-            <p style={subtitle}>
-              Beginner friendly roadmap to understand markets, risk, and trading discipline.
+          <p style={{ marginTop: "12px", color: "#555" }}>
+            {course.description}
+          </p>
+
+          {/* PROGRESS */}
+          <div style={{ marginTop: "20px" }}>
+            <div
+              style={{
+                height: "8px",
+                borderRadius: "10px",
+                background: "#eee",
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  width: `${course.progress}%`,
+                  height: "100%",
+                  background: "#C9A24D",
+                }}
+              />
+            </div>
+            <p style={{ marginTop: "6px", fontSize: "14px" }}>
+              Progress: {course.progress}%
             </p>
-
-            <h3>What you'll learn</h3>
-            <ul style={list}>
-              <li>How the stock market works</li>
-              <li>Stock types & trading styles</li>
-              <li>Basics of chart reading</li>
-              <li>Risk management & psychology</li>
-            </ul>
-
-            <button style={enrollBtn}>Enroll Now</button>
-
-            <div style={priceCard}>
-              <h3>Course Price</h3>
-              <h1>₹ 4,999</h1>
-              <p>One-time payment. Lifetime access.</p>
-            </div>
-
-            <div style={instructor}>
-              <h3>Instructor</h3>
-              <p><b>Rahul Mehta</b></p>
-              <p>SEBI Certified Market Analyst</p>
-              <p>12+ years experience in Indian stock markets.</p>
-            </div>
           </div>
 
-          {/* RIGHT */}
-          <div>
-            <div style={infoCard}>
-              <h3>Course Info</h3>
-              <p><b>Duration:</b> 6 Weeks</p>
-              <p><b>Level:</b> Beginner</p>
-              <p><b>Certification:</b> Yes</p>
-            </div>
-
-            <div style={syllabus}>
-              <h3>Course Syllabus</h3>
-
-              {["Market Basics", "Technical Analysis", "Risk Management", "Trading Psychology"].map((item, i) => (
-                <div key={i} style={accordion}>
-                  <div style={accHeader} onClick={() => toggle(i)}>
-                    {item}
-                    <span>{open === i ? "−" : "+"}</span>
-                  </div>
-                  {open === i && <div style={accBody}>Detailed lessons and live trading setups.</div>}
-                </div>
-              ))}
-            </div>
+          {/* LESSON LIST */}
+          <div style={{ marginTop: "30px" }}>
+            {course.lessons.map((lesson) => (
+              <LessonItem key={lesson.id} lesson={lesson} />
+            ))}
           </div>
         </div>
-      </section>
+      </div>
     </>
   );
 }
 
-const page = {
-  background: "#ffffff",
-  minHeight: "100vh",
-  padding: "60px 20px"
-};
+/* ================= COMPONENTS ================= */
 
-const container = {
-  maxWidth: "1200px",
-  margin: "auto",
-  display: "grid",
-  gridTemplateColumns: "1.4fr 1fr",
-  gap: "60px"
-};
+function LessonItem({ lesson }) {
+  return (
+    <div
+      style={{
+        padding: "16px 20px",
+        borderRadius: "14px",
+        background: lesson.locked ? "#f5f5f5" : "#fff",
+        border: "1px solid #eee",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "12px",
+        opacity: lesson.locked ? 0.6 : 1,
+      }}
+    >
+      <span style={{ fontWeight: "600" }}>{lesson.title}</span>
 
-const title = { fontSize: "42px", color: "#111" };
-const subtitle = { color: "#666", fontSize: "18px", marginBottom: "25px" };
-const list = { lineHeight: "2", color: "#444" };
-
-const enrollBtn = {
-  marginTop: "30px",
-  background: "#C9A24D",
-  color: "#000",
-  border: "none",
-  borderRadius: "30px",
-  padding: "14px 40px",
-  fontSize: "16px",
-  fontWeight: "700",
-  cursor: "pointer"
-};
-
-const priceCard = {
-  marginTop: "40px",
-  padding: "25px",
-  border: "2px solid #C9A24D",
-  borderRadius: "20px"
-};
-
-const instructor = {
-  marginTop: "30px",
-  padding: "20px",
-  background: "#f9f9f9",
-  borderRadius: "15px"
-};
-
-const infoCard = {
-  padding: "30px",
-  border: "2px solid #C9A24D",
-  borderRadius: "20px"
-};
-
-const syllabus = {
-  marginTop: "30px",
-  padding: "30px",
-  borderRadius: "20px",
-  background: "#fff",
-  border: "1px solid #ddd"
-};
-
-const accordion = {
-  marginTop: "15px",
-  border: "1px solid #ddd",
-  borderRadius: "10px"
-};
-
-const accHeader = {
-  padding: "15px",
-  display: "flex",
-  justifyContent: "space-between",
-  cursor: "pointer",
-  fontWeight: "600"
-};
-
-const accBody = {
-  padding: "15px",
-  color: "#666"
-};
+      {lesson.completed && <span>✔</span>}
+      {lesson.locked && <span>🔒</span>}
+      {!lesson.completed && !lesson.locked && (
+        <button
+          style={{
+            padding: "6px 14px",
+            borderRadius: "16px",
+            border: "none",
+            background: "#C9A24D",
+            fontWeight: "700",
+            cursor: "pointer",
+          }}
+        >
+          Play
+        </button>
+      )}
+    </div>
+  );
+}
