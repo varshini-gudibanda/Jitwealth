@@ -7,8 +7,8 @@ import AppHome from "./pages/AppHome.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
-
 import BackgroundVideo from "./components/BackgroundVideo.jsx";
+import VideoLesson from "./pages/VideoLesson.jsx";
 
 export default function App() {
   return (
@@ -26,6 +26,7 @@ export default function App() {
         <Route path="/courses" element={<Courses />} />
         <Route path="/calculator" element={<Calculator />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/lesson" element={<VideoLesson />} />
       </Routes>
     </BrowserRouter>
   );

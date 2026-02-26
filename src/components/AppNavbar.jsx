@@ -28,20 +28,23 @@ export default function AppNavbar({ activeSection }) {
         zIndex: 1000
       }}
     >
-      {/* BRAND */}
+      {/* BRAND (Redirect to Public Landing Page) */}
       <div
-        onClick={() => go("/app")}
+        onClick={() => go("/")}
         style={{
           fontWeight: "800",
           fontSize: "26px",
           cursor: "pointer",
-          color: "#111"
+          color: "#111",
+          transition: "0.2s"
         }}
+        onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.7")}
+        onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
       >
         JitWealth
       </div>
 
-      {/* NAV */}
+      {/* NAVIGATION */}
       <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
         <NavBtn active={isActive("home")} onClick={() => go("/app")}>
           Home
@@ -70,8 +73,15 @@ export default function AppNavbar({ activeSection }) {
             cursor: "pointer",
             fontSize: "18px",
             fontWeight: "700",
-            color: "#000"
+            color: "#000",
+            transition: "0.25s"
           }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.transform = "scale(1.1)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.transform = "scale(1)")
+          }
         >
           👤
         </div>
@@ -89,7 +99,7 @@ export default function AppNavbar({ activeSection }) {
   );
 }
 
-/* ---------- Buttons ---------- */
+/* ---------- NAV BUTTON ---------- */
 
 function NavBtn({ children, onClick, active }) {
   return (
@@ -105,11 +115,23 @@ function NavBtn({ children, onClick, active }) {
         fontWeight: "600",
         transition: "0.25s"
       }}
+      onMouseEnter={(e) => {
+        if (!active) {
+          e.currentTarget.style.background = "#C9A24D22";
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!active) {
+          e.currentTarget.style.background = "transparent";
+        }
+      }}
     >
       {children}
     </button>
   );
 }
+
+/* ---------- GOLD BUTTON ---------- */
 
 function GoldBtn({ children, onClick }) {
   return (
@@ -121,8 +143,15 @@ function GoldBtn({ children, onClick }) {
         borderRadius: "20px",
         padding: "8px 18px",
         cursor: "pointer",
-        fontWeight: "700"
+        fontWeight: "700",
+        transition: "0.25s"
       }}
+      onMouseEnter={(e) =>
+        (e.currentTarget.style.transform = "scale(1.05)")
+      }
+      onMouseLeave={(e) =>
+        (e.currentTarget.style.transform = "scale(1)")
+      }
     >
       {children}
     </button>

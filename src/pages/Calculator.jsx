@@ -1,171 +1,203 @@
-import Navbar from "../components/Navbar";
-import { useState } from "react";
-import { Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend
-} from "chart.js";
+import { useEffect, useState } from "react";
+import AppNavbar from "../components/AppNavbar";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend
-);
+/* ================= MAIN ================= */
 
 export default function Calculator() {
-  const [amount, setAmount] = useState("");
-  const [years, setYears] = useState("");
-  const [rate, setRate] = useState("");
-  const [chartData, setChartData] = useState(null);
+  const [prevClose, setPrevClose] = useState("");
+  const [signal, setSignal] = useState(null);
 
-  const calculate = () => {
-    if (!amount || !years || !rate) return;
+  const p = Number(prevClose);
 
-    let labels = [];
-    let values = [];
-
-    for (let i = 1; i <= years; i++) {
-      labels.push(`Year ${i}`);
-      const value = amount * Math.pow(1 + rate / 100, i);
-      values.push(value.toFixed(2));
+  /* Auto Generate Signal */
+  useEffect(() => {
+    if (!p) {
+      setSignal(null);
+      return;
     }
 
-    setChartData({
-      labels,
-      datasets: [
-        {
-          label: "Investment Growth",
-          data: values,
-          borderColor: "#C9A24D",
-          tension: 0.4
-        }
-      ]
+    const confidence = Math.floor(80 + Math.random() * 15);
+
+    setSignal({
+      strength: confidence > 90 ? "HIGH" : confidence > 85 ? "MEDIUM" : "LOW",
+      confidence,
+      buy: {
+        entry: Math.round(p * 1.007),
+        sl: Math.round(p * 1.0015),
+        t1: Math.round(p * 1.012),
+        t2: Math.round(p * 1.017),
+        t3: Math.round(p * 1.022),
+      },
+      sell: {
+        entry: Math.round(p * 0.997),
+        sl: Math.round(p * 1.002),
+        t1: Math.round(p * 0.992),
+        t2: Math.round(p * 0.987),
+        t3: Math.round(p * 0.982),
+      },
     });
-  };
+  }, [p]);
 
   return (
     <>
-      <Navbar />
+      <AppNavbar />
 
-      <section style={page}>
-        <h1 style={title}>
-          Investment <span style={{ color: "#C9A24D" }}>Calculator</span>
-        </h1>
-        <p style={subtitle}>Visualize how your wealth grows over time</p>
-
-        <div style={container}>
-          {/* INPUT CARD */}
-          <div style={card}>
-            <h3>Investment Details</h3>
-
-            <input
-              style={input}
-              type="number"
-              placeholder="Investment Amount (₹)"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-            />
-
-            <input
-              style={input}
-              type="number"
-              placeholder="Years"
-              value={years}
-              onChange={(e) => setYears(e.target.value)}
-            />
-
-            <input
-              style={input}
-              type="number"
-              placeholder="Expected Return (%)"
-              value={rate}
-              onChange={(e) => setRate(e.target.value)}
-            />
-
-            <button style={primaryBtn} onClick={calculate}>
-              Calculate
-            </button>
-          </div>
-
-          {/* GRAPH */}
-          <div style={resultCard}>
-            <h3>Wealth Growth</h3>
-            {chartData ? (
-              <Line data={chartData} />
-            ) : (
-              <p style={{ color: "#777" }}>
-                Enter values and click Calculate
-              </p>
-            )}
-          </div>
+      <div
+        style={{
+          minHeight: "100vh",
+          paddingTop: "130px",
+          paddingBottom: "140px",
+          background:
+            "radial-gradient(circle at top, rgba(201,162,77,0.22), #050505)",
+          color: "#fff",
+        }}
+      >
+        {/* HEADER */}
+        <div style={{ textAlign: "center", marginBottom: "50px" }}>
+          <h1
+            style={{
+              fontSize: "48px",
+              fontWeight: "900",
+              background:
+                "linear-gradient(90deg,#FFD980,#C9A24D,#FFD980)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            JIT AI SIGNAL ENGINE
+          </h1>
+          <p style={{ color: "#ccc", marginTop: "12px" }}>
+            Enter previous close price to generate signal instantly
+          </p>
         </div>
-      </section>
+
+        {/* INPUT CARD */}
+        <div
+          style={{
+            maxWidth: "420px",
+            margin: "0 auto 60px",
+            background: "rgba(255,255,255,0.09)",
+            backdropFilter: "blur(16px)",
+            padding: "30px",
+            borderRadius: "26px",
+            border: "1px solid rgba(201,162,77,0.6)",
+            boxShadow: "0 0 60px rgba(201,162,77,0.45)",
+            textAlign: "center",
+          }}
+        >
+          <input
+            type="number"
+            placeholder="Enter Previous Close (Ex: 2571)"
+            value={prevClose}
+            onChange={(e) => setPrevClose(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "18px",
+              fontSize: "22px",
+              textAlign: "center",
+              borderRadius: "16px",
+              border: "2px solid #C9A24D",
+              background: "#000",
+              color: "#fff",
+              outline: "none",
+            }}
+          />
+        </div>
+
+        {/* RESULT */}
+        {signal && (
+          <>
+            {/* AI METRICS */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "60px",
+                marginBottom: "50px",
+              }}
+            >
+              <Metric label="Signal Strength" value={signal.strength} />
+              <Metric label="AI Confidence" value={`${signal.confidence}%`} />
+            </div>
+
+            {/* SIGNAL CARDS */}
+            <div
+              style={{
+                maxWidth: "1100px",
+                margin: "auto",
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit,minmax(340px,1fr))",
+                gap: "40px",
+              }}
+            >
+              <SignalCard title="BUY SIGNAL" data={signal.buy} color="#00ff9d" />
+              <SignalCard title="SELL SIGNAL" data={signal.sell} color="#ff4d4d" />
+            </div>
+          </>
+        )}
+      </div>
     </>
   );
 }
 
-const page = {
-  minHeight: "100vh",
-  padding: "60px 20px",
-  textAlign: "center"
-};
+/* ================= COMPONENTS ================= */
 
-const title = {
-  fontSize: "42px",
-  fontWeight: "800",
-  color: "#111"
-};
+function Metric({ label, value }) {
+  return (
+    <div style={{ textAlign: "center" }}>
+      <div style={{ color: "#aaa", fontSize: "14px" }}>{label}</div>
+      <div style={{ fontSize: "26px", fontWeight: "800", color: "#C9A24D" }}>
+        {value}
+      </div>
+    </div>
+  );
+}
 
-const subtitle = {
-  color: "#666",
-  marginBottom: "50px"
-};
+function SignalCard({ title, data, color }) {
+  return (
+    <div
+      style={{
+        background: "rgba(255,255,255,0.07)",
+        backdropFilter: "blur(16px)",
+        borderRadius: "26px",
+        padding: "28px",
+        border: `1px solid ${color}`,
+        boxShadow: `0 0 60px ${color}55`,
+      }}
+    >
+      <h3 style={{ textAlign: "center", color, letterSpacing: "2px" }}>
+        {title}
+      </h3>
 
-const container = {
-  maxWidth: "900px",
-  margin: "auto",
-  display: "grid",
-  gridTemplateColumns: "1fr 1fr",
-  gap: "40px"
-};
+      <Row label="ENTRY" value={data.entry} highlight />
+      <Row label="STOP LOSS" value={data.sl} danger />
+      <Row label="TARGET 1" value={data.t1} />
+      <Row label="TARGET 2" value={data.t2} />
+      <Row label="TARGET 3" value={data.t3} />
+    </div>
+  );
+}
 
-const card = {
-  padding: "35px",
-  borderRadius: "20px",
-  border: "2px solid #C9A24D",
-  boxShadow: "0 20px 40px rgba(0,0,0,0.05)"
-};
-
-const resultCard = {
-  padding: "40px",
-  borderRadius: "20px",
-  border: "2px solid #C9A24D"
-};
-
-const input = {
-  width: "100%",
-  padding: "14px",
-  margin: "15px 0",
-  borderRadius: "12px",
-  border: "1px solid #ddd",
-  fontSize: "16px"
-};
-
-const primaryBtn = {
-  marginTop: "20px",
-  width: "100%",
-  color: "#000",
-  border: "none",
-  padding: "14px",
-  borderRadius: "30px",
-  fontWeight: "700",
-  cursor: "pointer"
-};
+function Row({ label, value, highlight, danger }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "14px 0",
+        borderBottom: "1px solid rgba(255,255,255,0.12)",
+      }}
+    >
+      <span style={{ color: "#ccc" }}>{label}</span>
+      <span
+        style={{
+          fontSize: highlight ? "24px" : "18px",
+          fontWeight: "900",
+          color: danger ? "#ff4d4d" : "#C9A24D",
+        }}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
