@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
 from core.response import success_response, error_response
+from core.permissions import IsAdminMember
 from .services import LoginAuditService
 
 
@@ -29,7 +30,7 @@ class MyLoginHistoryView(APIView):
 
 
 class MemberLoginHistoryView(APIView):
-	permission_classes = [IsAuthenticated]
+	permission_classes = [IsAuthenticated, IsAdminMember]
 
 	def get(self, request, member_id):
 		page = int(request.query_params.get("page", 1))

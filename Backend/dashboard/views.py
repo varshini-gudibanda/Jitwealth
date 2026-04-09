@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
 from core.response import success_response, error_response
+from core.permissions import IsAdminMember
 from .services import DashboardService
 
 
@@ -22,7 +23,7 @@ class MyDashboardOverviewView(APIView):
 
 
 class MemberDashboardOverviewView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdminMember]
 
     def get(self, request, member_id):
         try:

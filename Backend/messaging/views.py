@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
 from core.response import success_response, error_response
+from core.permissions import IsAdminMember, is_admin_member
 from .serializers import SendWAMessageSerializer, UpdateWAMessageStatusSerializer
 from .services import WAMessageService
 
@@ -15,9 +16,17 @@ class SendWAMessageView(APIView):
 		if not serializer.is_valid():
 			return error_response("Validation error", serializer.errors, status.HTTP_400_BAD_REQUEST)
 
+		target_member_id = serializer.validated_data["member_id"]
+		request_member_id = getattr(request.user, "member_id", None)
+		if request_member_id is None:
+			return error_response("Unauthorized", status_code=status.HTTP_401_UNAUTHORIZED)
+
+		if target_member_id != request_member_id and not is_admin_member(request.user):
+			return error_response("Forbidden", status_code=status.HTTP_403_FORBIDDEN)
+
 		try:
 			data = WAMessageService().queue_message(
-				member_id=serializer.validated_data["member_id"],
+				member_id=target_member_id,
 				msg_type=serializer.validated_data["msg_type"],
 				msg=serializer.validated_data["msg"],
 			)
@@ -41,9 +50,17 @@ class WAMessageHistoryView(APIView):
 		if not member_id:
 			return error_response("member_id is required", status_code=status.HTTP_400_BAD_REQUEST)
 
+		target_member_id = int(member_id)
+		request_member_id = getattr(request.user, "member_id", None)
+		if request_member_id is None:
+			return error_response("Unauthorized", status_code=status.HTTP_401_UNAUTHORIZED)
+
+		if target_member_id != request_member_id and not is_admin_member(request.user):
+			return error_response("Forbidden", status_code=status.HTTP_403_FORBIDDEN)
+
 		try:
 			data = WAMessageService().get_history(
-				member_id=int(member_id),
+				member_id=target_member_id,
 				page=page,
 				page_size=page_size,
 			)
@@ -53,7 +70,7 @@ class WAMessageHistoryView(APIView):
 
 
 class UpdateWAMessageStatusView(APIView):
-	permission_classes = [IsAuthenticated]
+	permission_classes = [IsAuthenticated, IsAdminMember]
 
 	def patch(self, request, msg_id):
 		serializer = UpdateWAMessageStatusSerializer(data=request.data)
