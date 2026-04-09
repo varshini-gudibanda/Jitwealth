@@ -1,9 +1,13 @@
-from django.shortcuts import render
-
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework import status
 from rest_framework_simplejwt.views import TokenRefreshView
+from core.throttles import (
+    AuthSignupThrottle,
+    AuthLoginThrottle,
+    AuthOTPSendThrottle,
+    AuthOTPVerifyThrottle,
+)
 
 from core.response import success_response, error_response
 from .serializers import (
@@ -21,6 +25,7 @@ def _client_ip(request):
 
 class SignupView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [AuthSignupThrottle]
 
     def post(self, request):
         s = SignupSerializer(data=request.data)
@@ -36,6 +41,7 @@ class SignupView(APIView):
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [AuthLoginThrottle]
 
     def post(self, request):
         s = LoginSerializer(data=request.data)
@@ -55,6 +61,7 @@ class LoginView(APIView):
 
 class SendOTPView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [AuthOTPSendThrottle]
 
     def post(self, request):
         s = SendOTPSerializer(data=request.data)
@@ -70,6 +77,7 @@ class SendOTPView(APIView):
 
 class VerifyOTPView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [AuthOTPVerifyThrottle]
 
     def post(self, request):
         s = VerifyOTPSerializer(data=request.data)
@@ -96,3 +104,4 @@ class MeView(APIView):
 
 class RefreshView(TokenRefreshView):
     permission_classes = [AllowAny]
+    throttle_scope = "auth_login"

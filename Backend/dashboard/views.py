@@ -4,11 +4,13 @@ from rest_framework import status
 
 from core.response import success_response, error_response
 from core.permissions import IsAdminMember
+from core.throttles import DashboardReadThrottle
 from .services import DashboardService
 
 
 class MyDashboardOverviewView(APIView):
     permission_classes = [IsAuthenticated]
+    throttle_classes = [DashboardReadThrottle]
 
     def get(self, request):
         member_id = getattr(request.user, "member_id", None)
@@ -24,6 +26,7 @@ class MyDashboardOverviewView(APIView):
 
 class MemberDashboardOverviewView(APIView):
     permission_classes = [IsAuthenticated, IsAdminMember]
+    throttle_classes = [DashboardReadThrottle]
 
     def get(self, request, member_id):
         try:

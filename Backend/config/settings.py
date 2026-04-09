@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+    'core.middleware.RequestIdMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -140,6 +141,24 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": os.getenv("THROTTLE_ANON", "60/min"),
+        "user": os.getenv("THROTTLE_USER", "300/min"),
+        "auth_signup": os.getenv("THROTTLE_AUTH_SIGNUP", "10/hour"),
+        "auth_login": os.getenv("THROTTLE_AUTH_LOGIN", "20/hour"),
+        "auth_otp_send": os.getenv("THROTTLE_AUTH_OTP_SEND", "10/hour"),
+        "auth_otp_verify": os.getenv("THROTTLE_AUTH_OTP_VERIFY", "30/hour"),
+        "msg_send": os.getenv("THROTTLE_MSG_SEND", "40/hour"),
+        "msg_status_update": os.getenv("THROTTLE_MSG_STATUS_UPDATE", "200/hour"),
+        "audit_read": os.getenv("THROTTLE_AUDIT_READ", "120/hour"),
+        "dashboard_read": os.getenv("THROTTLE_DASHBOARD_READ", "240/hour"),
+    },
+    "EXCEPTION_HANDLER": "core.exceptions.custom_exception_handler",
 }   
 # JWT Configuration
 SIMPLE_JWT = {
@@ -159,3 +178,31 @@ CORS_ALLOW_CREDENTIALS = True
 # MongoDB Connection (will initialize at app startup)
 MONGO_URI = os.getenv('MONGO_URI')
 MONGO_DB_NAME = os.getenv('MONGO_DB_NAME', 'Jitwealth')
+
+# Logging
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "request_id_filter": {
+            "()": "core.logging_filters.RequestIdFilter",
+        },
+    },
+    "formatters": {
+        "standard": {
+            "format": "%(asctime)s %(levelname)s [%(name)s] [request_id=%(request_id)s] %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "filters": ["request_id_filter"],
+            "formatter": "standard",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": LOG_LEVEL,
+    },
+}
