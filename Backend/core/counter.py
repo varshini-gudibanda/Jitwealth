@@ -1,5 +1,5 @@
+from pymongo import ReturnDocument
 from core.mongodb import mongodb
-from bson import ObjectId
 
 class Counter:
     """Auto-incrementing ID generator"""
@@ -13,7 +13,7 @@ class Counter:
             {'_id': counter_name},
             {'$inc': {'sequence': 1}},
             upsert=True,
-            return_document=True
+            return_document=ReturnDocument.AFTER
         )
         
         return result['sequence']
