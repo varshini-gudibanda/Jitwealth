@@ -7,6 +7,7 @@ class DashboardRepository:
         self.messages = mongodb.get_collection("wa_msgs")
         self.logins = mongodb.get_collection("login_master")
         self.otps = mongodb.get_collection("otp")
+        self.progress = mongodb.get_collection("progress")
 
     def get_member(self, member_id):
         return self.members.find_one({"member_id": member_id}, {"_id": 0, "password_hash": 0})
@@ -34,3 +35,6 @@ class DashboardRepository:
 
     def count_active_otps_by_member(self, member_id):
         return self.otps.count_documents({"member_id": member_id, "otp_status": 1})
+
+    def list_progress_by_member(self, member_id):
+        return list(self.progress.find({"member_id": member_id}, {"_id": 0, "progress": 1}))

@@ -34,3 +34,19 @@ class MemberDashboardOverviewView(APIView):
             return success_response(data=data, message="Member dashboard overview fetched")
         except ValueError as e:
             return error_response(str(e), status_code=status.HTTP_404_NOT_FOUND)
+
+
+class DashboardSummaryView(APIView):
+    permission_classes = [IsAuthenticated]
+    throttle_classes = [DashboardReadThrottle]
+
+    def get(self, request):
+        member_id = getattr(request.user, "member_id", None)
+        if member_id is None:
+            return error_response("Unauthorized", status_code=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            data = DashboardService().dashboard_summary(member_id)
+            return success_response(data=data, message="Dashboard summary fetched")
+        except ValueError as e:
+            return error_response(str(e), status_code=status.HTTP_404_NOT_FOUND)
