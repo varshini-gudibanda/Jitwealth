@@ -88,25 +88,6 @@ export async function me() {
   return request('/api/v1/auth/me/');
 }
 
-export async function getCourses() {
-  return request('/api/v1/courses/');
-}
-
-export async function getMyCourses() {
-  return request('/api/v1/my-courses/');
-}
-
-export async function getCourseDetail(courseId) {
-  return request(`/api/v1/courses/${courseId}/`);
-}
-
-export async function calculateSignal(prevClose) {
-  return request('/api/v1/calculator/calculate/', {
-    method: 'POST',
-    body: JSON.stringify({ prev_close: prevClose })
-  });
-}
-
 export function logout() {
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
@@ -114,6 +95,6 @@ export function logout() {
   localStorage.removeItem('fullName');
 }
 
-const apiClient = { login, signup, me, getCourses, getMyCourses, getCourseDetail, calculateSignal, logout };
+const apiClient = { login, signup, me, logout };
 
 export default apiClient;

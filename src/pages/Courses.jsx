@@ -1,6 +1,34 @@
 import { useEffect, useState } from "react";
 import AppNavbar from "../components/AppNavbar";
-import api from "../api/client";
+
+/* ================= MOCK DATA (Backend Ready) ================= */
+
+const mockCourses = [
+  {
+    id: 1,
+    title: "Intraday Trading Mastery",
+    description: "Learn high probability intraday strategies",
+    progress: 65,
+    status: "In Progress",
+    image: "/course-images/intraday.jpg",
+  },
+  {
+    id: 2,
+    title: "Options Scalping Pro",
+    description: "Advanced options scalping framework",
+    progress: 100,
+    status: "Completed",
+    image: "/course-images/options.jpg",
+  },
+  {
+    id: 3,
+    title: "Swing Trading Blueprint",
+    description: "Hold trades with confidence",
+    progress: 0,
+    status: "Paid",
+    image: "/course-images/swing.jpg",
+  },
+];
 
 /* ================= MAIN ================= */
 
@@ -9,23 +37,15 @@ export default function Courses() {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("All");
   const [darkMode, setDarkMode] = useState(false);
-  const [error, setError] = useState(null);
 
   const filters = ["All", "In Progress", "Completed", "Expired", "Paid"];
 
-  /* Fetch courses from backend */
+  /* Simulate API */
   useEffect(() => {
-    (async () => {
-      try {
-        const data = await api.getMyCourses();
-        setCourses(Array.isArray(data) ? data : data.courses || []);
-        setLoading(false);
-      } catch (err) {
-        console.error("Failed to fetch courses:", err);
-        setError(err.message);
-        setLoading(false);
-      }
-    })();
+    setTimeout(() => {
+      setCourses(mockCourses);
+      setLoading(false);
+    }, 1400);
   }, []);
 
   const filteredCourses =
