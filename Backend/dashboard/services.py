@@ -50,22 +50,3 @@ class DashboardService:
                 "active_members": active_members,
             },
         }
-
-    def dashboard_summary(self, member_id):
-        member = self.repo.get_member(member_id)
-        if not member:
-            raise ValueError("Member not found")
-
-        rows = self.repo.list_progress_by_member(member_id)
-        enrolled_count = len(rows)
-        completed_count = sum(1 for r in rows if r.get("progress", 0) >= 100)
-        in_progress_count = sum(1 for r in rows if 0 < r.get("progress", 0) < 100)
-        avg_progress = int(sum(r.get("progress", 0) for r in rows) / enrolled_count) if enrolled_count else 0
-
-        return {
-            "member_id": member_id,
-            "enrolled_count": enrolled_count,
-            "completed_count": completed_count,
-            "in_progress_count": in_progress_count,
-            "average_progress": avg_progress,
-        }

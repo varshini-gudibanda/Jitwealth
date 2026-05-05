@@ -20,14 +20,23 @@ class MongoDB:
             try:
                 mongo_uri = os.getenv('MONGO_URI')
                 db_name = os.getenv('MONGO_DB_NAME', 'Jitwealth')
-                
+                max_pool_size = int(os.getenv('MONGO_MAX_POOL_SIZE', '50'))
+                min_pool_size = int(os.getenv('MONGO_MIN_POOL_SIZE', '5'))
+                server_selection_timeout_ms = int(os.getenv('MONGO_SERVER_SELECTION_TIMEOUT_MS', '5000'))
+                connect_timeout_ms = int(os.getenv('MONGO_CONNECT_TIMEOUT_MS', '10000'))
+                socket_timeout_ms = int(os.getenv('MONGO_SOCKET_TIMEOUT_MS', '20000'))
+
                 if not mongo_uri:
                     raise ValueError("MONGO_URI not set in environment")
                 
                 self._client = MongoClient(
                     mongo_uri,
-                    serverSelectionTimeoutMS=5000,
-                    connectTimeoutMS=10000,
+                    maxPoolSize=max_pool_size,
+                    minPoolSize=min_pool_size,
+                    serverSelectionTimeoutMS=server_selection_timeout_ms,
+                    connectTimeoutMS=connect_timeout_ms,
+                    socketTimeoutMS=socket_timeout_ms,
+                    retryWrites=True,
                 )
                 
                 # Test connection

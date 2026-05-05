@@ -8,7 +8,7 @@ class SignupSerializer(serializers.Serializer):
     mobile_number = serializers.CharField(max_length=15)
     province_id = serializers.IntegerField()
 
-    salutation = serializers.IntegerField(required=False, default=0)
+    salutation = serializers.IntegerField(required=False, default=1)  # 1=Mr, 2=Mrs, 3=Ms
     dob = serializers.DateField(required=False, allow_null=True)
     address = serializers.CharField(required=False, allow_blank=True)
     city = serializers.CharField(required=False, allow_blank=True)
@@ -16,7 +16,7 @@ class SignupSerializer(serializers.Serializer):
     whatsapp_number = serializers.CharField(required=False, allow_blank=True)
     about = serializers.CharField(required=False, allow_blank=True)
     membership_type = serializers.IntegerField(required=False, default=1)
-    job_status = serializers.IntegerField(required=False, default=0)
+    job_status = serializers.IntegerField(required=False, default=1)  # 1=salary, 2=self-employed, 3=student, 4=retired, 5=business
 
     def validate_mobile_number(self, value):
         if not value.isdigit():

@@ -1,24 +1,23 @@
 import Navbar from "../components/Navbar";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../api/client";
 
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = (e) => {
   e.preventDefault();
-
-  if (!email.endsWith("@gmail.com")) {
-    alert("Only @gmail.com allowed");
-    return;
-  }
-
-  // save login
-  localStorage.setItem("userEmail", email);
-
-  // go to app landing
-  navigate("/app");
+  (async () => {
+    try {
+      await api.login(email, password);
+      navigate("/app");
+    } catch (err) {
+      alert(err.message || 'Login failed');
+    }
+  })();
 };
 
   return (
@@ -66,6 +65,8 @@ export default function Login() {
             <input
               type="password"
               placeholder="Enter Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
               style={inputStyle}
             />

@@ -4,14 +4,12 @@ from rest_framework import status
 
 from core.response import success_response, error_response
 from core.permissions import IsAdminMember, is_admin_member
-from core.throttles import MessageSendThrottle, MessageStatusUpdateThrottle
 from .serializers import SendWAMessageSerializer, UpdateWAMessageStatusSerializer
 from .services import WAMessageService
 
 
 class SendWAMessageView(APIView):
 	permission_classes = [IsAuthenticated]
-	throttle_classes = [MessageSendThrottle]
 
 	def post(self, request):
 		serializer = SendWAMessageSerializer(data=request.data)
@@ -43,21 +41,16 @@ class SendWAMessageView(APIView):
 
 class WAMessageHistoryView(APIView):
 	permission_classes = [IsAuthenticated]
-	throttle_scope = "audit_read"
 
 	def get(self, request):
 		member_id = request.query_params.get("member_id")
+		page = int(request.query_params.get("page", 1))
+		page_size = int(request.query_params.get("page_size", 20))
 
 		if not member_id:
 			return error_response("member_id is required", status_code=status.HTTP_400_BAD_REQUEST)
 
-		try:
-			target_member_id = int(member_id)
-			page = int(request.query_params.get("page", 1))
-			page_size = int(request.query_params.get("page_size", 20))
-		except ValueError:
-			return error_response("member_id, page and page_size must be integers", status_code=status.HTTP_400_BAD_REQUEST)
-
+		target_member_id = int(member_id)
 		request_member_id = getattr(request.user, "member_id", None)
 		if request_member_id is None:
 			return error_response("Unauthorized", status_code=status.HTTP_401_UNAUTHORIZED)
@@ -78,7 +71,6 @@ class WAMessageHistoryView(APIView):
 
 class UpdateWAMessageStatusView(APIView):
 	permission_classes = [IsAuthenticated, IsAdminMember]
-	throttle_classes = [MessageStatusUpdateThrottle]
 
 	def patch(self, request, msg_id):
 		serializer = UpdateWAMessageStatusSerializer(data=request.data)

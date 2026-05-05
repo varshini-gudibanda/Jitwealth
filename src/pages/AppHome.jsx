@@ -6,16 +6,30 @@ import ContactFooter from "../components/ContactFooter";
 import FloatingWhatsApp from "../components/FloatingWhatsApp";
 import BackgroundVideo from "../components/BackgroundVideo";
 import GlassOverlay from "../components/GlassOverlay";
+import api from "../api/client";
 
 export default function AppHome() {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("home");
+  const [profile, setProfile] = useState(null);
 
   const userEmail =
-    localStorage.getItem("userEmail") || "user@jitwealth.com";
-  const userName = userEmail.split("@")[0];
+    profile?.email_id || localStorage.getItem("userEmail") || "user@jitwealth.com";
+  const fullName = profile?.full_name || localStorage.getItem("fullName") || userEmail.split("@")[0];
 
   useEffect(() => {
+    if (!localStorage.getItem("accessToken")) {
+      navigate("/login");
+      return;
+    }
+
+    api.me()
+      .then((data) => setProfile(data))
+      .catch(() => {
+        api.logout();
+        navigate("/login");
+      });
+
     const sectionIds = ["home", "courses", "calculator", "contact"];
 
     const observer = new IntersectionObserver(
@@ -35,7 +49,7 @@ export default function AppHome() {
     });
 
     return () => observer.disconnect();
-  }, []);
+  }, [navigate]);
 
   return (
     <>
@@ -58,7 +72,7 @@ export default function AppHome() {
         {/* HOME */}
         <Section
           id="home"
-          title={`Welcome, ${userName}`}
+          title={`Welcome, ${fullName}`}
           desc={
             <>
               <div

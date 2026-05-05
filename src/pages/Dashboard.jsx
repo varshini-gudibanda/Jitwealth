@@ -1,18 +1,28 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import api from "../api/client";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
 
-  const email = localStorage.getItem("userEmail");
-  const username = email ? email.split("@")[0] : "Trader";
+  const email = profile?.email_id || localStorage.getItem("userEmail");
+  const fullName = profile?.full_name || localStorage.getItem("fullName") || email.split("@")[0] || "Trader";
 
-  // Protect dashboard
   useEffect(() => {
-    if (!email) {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
       navigate("/login");
+      return;
     }
+
+    api.me()
+      .then((data) => setProfile(data))
+      .catch(() => {
+        api.logout();
+        navigate("/login");
+      });
   }, [email, navigate]);
 
   return (
@@ -36,7 +46,7 @@ export default function Dashboard() {
           >
             Welcome,{" "}
             <span style={{ color: "#C9A24D" }}>
-              {username}
+              {fullName}
             </span>
           </h1>
 

@@ -1,41 +1,39 @@
 import { useEffect, useState } from "react";
 import AppNavbar from "../components/AppNavbar";
+import api from "../api/client";
 
 /* ================= MAIN ================= */
 
 export default function Calculator() {
   const [prevClose, setPrevClose] = useState("");
   const [signal, setSignal] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const p = Number(prevClose);
 
-  /* Auto Generate Signal */
+  /* Fetch signal from backend */
   useEffect(() => {
-    if (!p) {
+    if (!p || p <= 0) {
       setSignal(null);
+      setError(null);
       return;
     }
 
-    const confidence = Math.floor(80 + Math.random() * 15);
-
-    setSignal({
-      strength: confidence > 90 ? "HIGH" : confidence > 85 ? "MEDIUM" : "LOW",
-      confidence,
-      buy: {
-        entry: Math.round(p * 1.007),
-        sl: Math.round(p * 1.0015),
-        t1: Math.round(p * 1.012),
-        t2: Math.round(p * 1.017),
-        t3: Math.round(p * 1.022),
-      },
-      sell: {
-        entry: Math.round(p * 0.997),
-        sl: Math.round(p * 1.002),
-        t1: Math.round(p * 0.992),
-        t2: Math.round(p * 0.987),
-        t3: Math.round(p * 0.982),
-      },
-    });
+    (async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await api.calculateSignal(p);
+        setSignal(data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Failed to calculate signal:", err);
+        setError(err.message || "Failed to calculate signal");
+        setSignal(null);
+        setLoading(false);
+      }
+    })();
   }, [p]);
 
   return (
@@ -105,7 +103,30 @@ export default function Calculator() {
         </div>
 
         {/* RESULT */}
-        {signal && (
+        {error && (
+          <div
+            style={{
+              maxWidth: "600px",
+              margin: "30px auto",
+              background: "rgba(255,77,77,0.2)",
+              border: "1px solid #ff4d4d",
+              borderRadius: "16px",
+              padding: "20px",
+              color: "#ff9999",
+              textAlign: "center",
+            }}
+          >
+            Error: {error}
+          </div>
+        )}
+
+        {loading && (
+          <div style={{ textAlign: "center", color: "#C9A24D", fontSize: "18px" }}>
+            Calculating signal...
+          </div>
+        )}
+
+        {signal && !loading && (
           <>
             {/* AI METRICS */}
             <div

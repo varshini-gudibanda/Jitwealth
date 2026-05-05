@@ -1,10 +1,25 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import api from "../api/client";
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // simple login check (you can improve later)
-  const isLoggedIn = !!localStorage.getItem("userEmail");
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setIsLoggedIn(false);
+      return;
+    }
+
+    api.me()
+      .then(() => setIsLoggedIn(true))
+      .catch(() => {
+        api.logout();
+        setIsLoggedIn(false);
+      });
+  }, []);
 
   const handleBrandClick = () => {
     if (isLoggedIn) {
@@ -41,21 +56,21 @@ export default function Navbar() {
       {/* Right side buttons */}
       <div style={{ display: "flex", gap: "12px" }}>
         {isLoggedIn ? (
-  <>
-    <NavBtn to="/app">Home</NavBtn>
-    <NavBtn to="/courses">Courses</NavBtn>
-    <NavBtn to="/calculator">Calculator</NavBtn>
-    <GoldBtn to="/dashboard">Profile</GoldBtn>
-    <LogoutBtn />
-  </>
-) : (
-  <>
-    <NavBtn to="/courses">Courses</NavBtn>
-    <NavBtn to="/calculator">Calculator</NavBtn>
-    <NavBtn to="/login">Login</NavBtn>
-    <GoldBtn to="/signup">Sign Up</GoldBtn>
-  </>
-)}
+          <>
+            <NavBtn to="/app">Home</NavBtn>
+            <NavBtn to="/courses">Courses</NavBtn>
+            <NavBtn to="/calculator">Calculator</NavBtn>
+            <GoldBtn to="/dashboard">Profile</GoldBtn>
+            <LogoutBtn />
+          </>
+        ) : (
+          <>
+            <NavBtn to="/courses">Courses</NavBtn>
+            <NavBtn to="/calculator">Calculator</NavBtn>
+            <NavBtn to="/login">Login</NavBtn>
+            <GoldBtn to="/signup">Sign Up</GoldBtn>
+          </>
+        )}
       </div>
     </nav>
   );
@@ -103,7 +118,7 @@ function LogoutBtn() {
   const navigate = useNavigate();
 
   const logout = () => {
-    localStorage.removeItem("userEmail");
+    api.logout();
     navigate("/");
     window.location.reload();
   };
