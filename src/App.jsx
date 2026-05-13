@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Home from "./pages/Home.jsx";
 import Courses from "./pages/Courses.jsx";
+import CourseDetail from "./pages/CourseDetail.jsx";
 import Calculator from "./pages/Calculator.jsx";
 import AppHome from "./pages/AppHome.jsx";
 import Login from "./pages/Login.jsx";
@@ -24,6 +25,7 @@ export default function App() {
 
         <Route path="/app" element={<AppHome />} />
         <Route path="/courses" element={<Courses />} />
+        <Route path="/course/:courseId" element={<CourseDetail />} />
         <Route path="/calculator" element={<Calculator />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/lesson" element={<VideoLesson />} />

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import AppNavbar from "../components/AppNavbar";
-
+ 
 /* ================= MAIN ================= */
 
 export default function Calculator() {

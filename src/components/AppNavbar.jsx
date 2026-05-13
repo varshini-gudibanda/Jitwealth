@@ -1,8 +1,15 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 export default function AppNavbar({ activeSection }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!accessToken);
+  }, []);
 
   const go = (path) => navigate(path);
 
@@ -58,42 +65,54 @@ export default function AppNavbar({ activeSection }) {
           Calculator
         </NavBtn>
 
-        {/* PROFILE ICON */}
-        <div
-          title="Profile"
-          onClick={() => go("/dashboard")}
-          style={{
-            width: "38px",
-            height: "38px",
-            borderRadius: "50%",
-            background: "#C9A24D",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            fontSize: "18px",
-            fontWeight: "700",
-            color: "#000",
-            transition: "0.25s"
-          }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.transform = "scale(1.1)")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.transform = "scale(1)")
-          }
-        >
-          👤
-        </div>
+        {/* PROFILE ICON - Only show if logged in */}
+        {isLoggedIn && (
+          <div
+            title="Profile"
+            onClick={() => go("/dashboard")}
+            style={{
+              width: "38px",
+              height: "38px",
+              borderRadius: "50%",
+              background: "#C9A24D",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              fontSize: "18px",
+              fontWeight: "700",
+              color: "#000",
+              transition: "0.25s"
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.transform = "scale(1.1)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.transform = "scale(1)")
+            }
+          >
+            👤
+          </div>
+        )}
 
-        <GoldBtn
-          onClick={() => {
-            localStorage.clear();
-            go("/");
-          }}
-        >
-          Logout
-        </GoldBtn>
+        {/* LOGOUT BUTTON - Only show if logged in */}
+        {isLoggedIn && (
+          <GoldBtn
+            onClick={() => {
+              localStorage.clear();
+              go("/");
+            }}
+          >
+            Logout
+          </GoldBtn>
+        )}
+
+        {/* LOGIN BUTTON - Only show if not logged in */}
+        {!isLoggedIn && (
+          <GoldBtn onClick={() => go("/login")}>
+            Login
+          </GoldBtn>
+        )}
       </div>
     </nav>
   );

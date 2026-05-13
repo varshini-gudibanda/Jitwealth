@@ -88,6 +88,29 @@ export async function me() {
   return request('/api/v1/auth/me/');
 }
 
+export async function getMyCourses() {
+  return request('/api/my-courses/');
+}
+
+export async function getAllCourses() {
+  return request('/api/courses/');
+}
+
+export async function getCourseById(courseId) {
+  return request(`/api/courses/${courseId}/`);
+}
+
+export async function getCourseLessons(courseId) {
+  return request(`/api/courses/${courseId}/lessons/`);
+}
+
+export async function markLessonComplete(lessonId) {
+  return request(`/api/lessons/${lessonId}/complete/`, { 
+    method: 'POST', 
+    body: JSON.stringify({}) 
+  });
+}
+
 export function logout() {
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
@@ -95,6 +118,6 @@ export function logout() {
   localStorage.removeItem('fullName');
 }
 
-const apiClient = { login, signup, me, logout };
+const apiClient = { login, signup, me, getMyCourses, getAllCourses, getCourseById, getCourseLessons, markLessonComplete, logout };
 
 export default apiClient;

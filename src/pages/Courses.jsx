@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import AppNavbar from "../components/AppNavbar";
+import { useNavigate } from "react-router-dom";
+import api from "../api/client";
 
 /* ================= MOCK DATA (Backend Ready) ================= */
 
@@ -33,19 +35,40 @@ const mockCourses = [
 /* ================= MAIN ================= */
 
 export default function Courses() {
+  const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("All");
   const [darkMode, setDarkMode] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const filters = ["All", "In Progress", "Completed", "Expired", "Paid"];
 
-  /* Simulate API */
+  /* Fetch user courses if logged in */
   useEffect(() => {
-    setTimeout(() => {
-      setCourses(mockCourses);
-      setLoading(false);
-    }, 1400);
+    const accessToken = localStorage.getItem("accessToken");
+    setIsLoggedIn(!!accessToken);
+
+    if (accessToken) {
+      // Fetch user's actual courses from backend
+      api.getMyCourses()
+        .then((data) => {
+          const courseList = Array.isArray(data) ? data : data?.courses || [];
+          setCourses(courseList.length > 0 ? courseList : mockCourses);
+          setLoading(false);
+        })
+        .catch(() => {
+          // Fallback to mock data if API fails
+          setCourses(mockCourses);
+          setLoading(false);
+        });
+    } else {
+      // Not logged in - show empty or public courses without progress
+      setTimeout(() => {
+        setCourses(mockCourses.map(c => ({ ...c, progress: 0, status: "Login Required" })));
+        setLoading(false);
+      }, 1400);
+    }
   }, []);
 
   const filteredCourses =
@@ -165,7 +188,7 @@ export default function Courses() {
 
           {!loading &&
             filteredCourses.map((course) => (
-              <CourseCard key={course.id} course={course} />
+              <CourseCard key={course.id} course={course} isLoggedIn={isLoggedIn} />
             ))}
         </div>
 
@@ -182,7 +205,17 @@ export default function Courses() {
 
 /* ================= COMPONENTS ================= */
 
-function CourseCard({ course }) {
+function CourseCard({ course, isLoggedIn }) {
+  const navigate = useNavigate();
+
+  const handleContinue = () => {
+    if (isLoggedIn) {
+      navigate(`/course/${course.id}`, { state: { course } });
+    } else {
+      navigate('/login');
+    }
+  };
+
   return (
     <div
       style={{
@@ -216,38 +249,58 @@ function CourseCard({ course }) {
           {course.description}
         </p>
 
-        {/* PROGRESS */}
-        <div style={{ marginTop: "18px" }}>
-          <div
-            style={{
-              height: "8px",
-              borderRadius: "10px",
-              background: "#eee",
-              overflow: "hidden",
-            }}
-          >
+        {/* PROGRESS - Only show for logged-in users */}
+        {isLoggedIn && course.progress !== undefined && (
+          <div style={{ marginTop: "18px" }}>
             <div
               style={{
-                width: `${course.progress}%`,
-                height: "100%",
-                background: "#C9A24D",
+                height: "8px",
+                borderRadius: "10px",
+                background: "#eee",
+                overflow: "hidden",
               }}
-            />
-          </div>
+            >
+              <div
+                style={{
+                  width: `${course.progress}%`,
+                  height: "100%",
+                  background: "#C9A24D",
+                }}
+              />
+            </div>
 
+            <div
+              style={{
+                marginTop: "6px",
+                fontSize: "13px",
+                color: "#555",
+              }}
+            >
+              Progress: {course.progress}%
+            </div>
+          </div>
+        )}
+
+        {/* LOGIN PROMPT - Show for non-logged-in users */}
+        {!isLoggedIn && (
           <div
             style={{
-              marginTop: "6px",
-              fontSize: "13px",
-              color: "#555",
+              marginTop: "18px",
+              padding: "12px",
+              textAlign: "center",
+              fontSize: "14px",
+              color: "#666",
+              background: "#f5f5f5",
+              borderRadius: "10px",
             }}
           >
-            Progress: {course.progress}%
+            Login to see your progress
           </div>
-        </div>
+        )}
 
         {/* ACTION */}
         <button
+          onClick={handleContinue}
           style={{
             marginTop: "18px",
             padding: "12px",
@@ -259,7 +312,7 @@ function CourseCard({ course }) {
             cursor: "pointer",
           }}
         >
-          {course.progress === 100 ? "View Course" : "Continue"}
+          {isLoggedIn ? (course.progress === 100 ? "View Course" : "Continue") : "Login to Enroll"}
         </button>
       </div>
     </div>
@@ -272,6 +325,7 @@ function StatusBadge({ status }) {
     Completed: "#2ecc71",
     Paid: "#f39c12",
     Expired: "#e74c3c",
+    "Login Required": "#999",
   };
 
   return (
@@ -280,7 +334,7 @@ function StatusBadge({ status }) {
         fontSize: "12px",
         padding: "4px 12px",
         borderRadius: "14px",
-        background: colors[status],
+        background: colors[status] || "#999",
         color: "#fff",
         fontWeight: "700",
       }}
